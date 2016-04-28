@@ -45,14 +45,25 @@ export function determineCardType(pan) {
  * @returns {boolean}
  */
 export function luhnCheck(pan) {
-  let sum = 0;
-  let flip = true;
-  for (let i = pan.length - 1; i >= 0; i--) {
-    const digit = parseInt(pan.charAt(i), 10);
-    sum += (flip = !flip) ? Math.floor((digit * 2) / 10) + Math.floor(digit * 2 % 10) : digit;
-  }
 
-  return sum % 10 === 0;
+  const checkCardNum = (function(arr) {
+    return function(ccNum) {
+      let len = ccNum.length;
+      let bit = 1;
+      let sum = 0;
+      let val;
+
+      while (len) {
+        val = parseInt(ccNum.charAt(--len), 10);
+        sum += (bit ^= 1) ? arr[val] : val;
+      }
+
+      return sum && sum % 10 === 0;
+    };
+  }([0, 2, 4, 6, 8, 1, 3, 5, 7, 9]));
+
+  return checkCardNum(pan);
+
 }
 
 /**
